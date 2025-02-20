@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Quiz App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
+    .quiz-container {
+      background: white;
+      padding: 20px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 300px;
+      border-radius: 8px;
+    }
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      width: 100%;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button.correct {
+      background-color: #28a745;
+    }
+    button.wrong {
+      background-color: #dc3545;
+    }
+    #next-btn {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Quiz App</h1>
+    <div id="question-container">
+      <p id="question-text"></p>
+      <div id="answer-buttons" class="btn-container"></div>
+    </div>
+    <button id="next-btn">Next</button>
+    <p id="score-text"></p>
+  </div>
+
+
+  <script>
+    // Questions data
+    const questions = [
+      {
+        question: "What is 2 + 2?",
+        answers: [
+          { text: "3", correct: false },
+          { text: "4", correct: true },
+          { text: "5", correct: false },
+        ],
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        answers: [
+          { text: "Earth", correct: false },
+          { text: "Mars", correct: true },
+          { text: "Jupiter", correct: false },
+        ],
+      },
+      {
+        question: "What is the capital of France?",
+        answers: [
+          { text: "London", correct: false },
+          { text: "Paris", correct: true },
+          { text: "Berlin", correct: false },
+        ],
+      },
+    ];
+
+
+    // Selecting UI elements
+    const questionContainer = document.getElementById("question-container");
+    const questionText = document.getElementById("question-text");
+    const answerButtons = document.getElementById("answer-buttons");
+    const nextButton = document.getElementById("next-btn");
+    const scoreText = document.getElementById("score-text");
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+
+    // Start the quiz
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      nextButton.innerText = "Next";
+      nextButton.style.display = "none";
+      showQuestion();
+    }
+
+
+    // Display a question and its answers
+    function showQuestion() {
+      resetState();
+      let currentQuestion = questions[currentQuestionIndex];
+      questionText.innerText = currentQuestion.question;
+
+
+      currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerText = answer.text;
+        button.classList.add("btn");
+        if (answer.correct) {
+          button.dataset.correct = answer.correct;
+        }
+        button.addEventListener("click", selectAnswer);
+        answerButtons.appendChild(button);
+      });
+    }
+
+
+    // Clear out previous question's state
+    function resetState() {
+      nextButton.style.display = "none";
+      scoreText.innerText = "";
+      while (answerButtons.firstChild) {
+        answerButtons.removeChild(answerButtons.firstChild);
+      }
+    }
+
+
+    // Process answer selection and provide feedback
+    function selectAnswer(e) {
+      const selectedBtn = e.target;
+      const correct = selectedBtn.dataset.correct === "true";
+
+
+      if (correct) {
+        selectedBtn.classList.add("correct");
+        score++;
+      } else {
+        selectedBtn.classList.add("wrong");
+      }
+
+
+      // Disable all buttons and highlight the correct one
+      Array.from(answerButtons.children).forEach(button => {
+        button.disabled = true;
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+        }
+      });
+
+
+      nextButton.style.display = "block";
+    }
+
+
+    // Handle the "Next" button click
+    nextButton.addEventListener("click", () => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showScore();
+      }
+    });
+
+
+    // Display final score and allow restart
+    function showScore() {
+      resetState();
+      questionText.innerText = `You scored ${score} out of ${questions.length}!`;
+      nextButton.innerText = "Restart Quiz";
+      nextButton.style.display = "block";
+      // Replace nextButton with a clone to remove any previous event listeners
+      nextButton.replaceWith(nextButton.cloneNode(true));
+      document.getElementById("next-btn").addEventListener("click", startQuiz);
+    }
+
+
+    // Initialize the quiz when page loads
+    startQuiz();
+  </script>
+</body>
+</html>
