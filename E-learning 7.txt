@@ -1,0 +1,11 @@
+function Dashboard() {
+  return (
+    <div className="p-10">
+      <h2 className="text-3xl font-bold">User Dashboard</h2>
+      <p className="mt-4">Track your progress and access enrolled courses here.</p>
+    </div>
+  );
+}
+
+
+export default Dashboard;
